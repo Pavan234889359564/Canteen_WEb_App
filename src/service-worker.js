@@ -110,3 +110,7 @@ self.addEventListener('sync', (event) => {
     console.log("Sync successfull!");
   }
 })
+
+
+
+

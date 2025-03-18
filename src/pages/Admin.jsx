@@ -7,7 +7,7 @@ import Nav from '../components/Navbar';
 
 export default function Admin() {
   useEffect(() => {
-    document.title = 'Admin | ScanToEat';
+    document.title = 'Admin | Amrita-Canteen';
   });
   return (
     <>
