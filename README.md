@@ -29,9 +29,9 @@ We are using Fire Base  For
 
 * To run Canteen web app :
 Clone the project in Vs code terminal or your local pc 
-for that commands :
-`git clone https://github.com/yourusername/your-repo-name.git
-cd your-repo-name`
+for that commands :\
+`git clone  https://github.com/Pavan234889359564/Canteen_WEb_App.git` \
+`cd your-repo-name`
 * After cloning the projects , run the file through this commands:\
    `npm install react-scripts`\
    `node -v`\
