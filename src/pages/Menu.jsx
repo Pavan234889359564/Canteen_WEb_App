@@ -1,7 +1,7 @@
 import React, { useState, useLayoutEffect, useEffect } from 'react';
 import Nav from '../components/Navbar';
 import ProfileNavBtn from '../components/buttons/ProfileNavBtn';
-import { Box, Text, SimpleGrid, VStack } from '@chakra-ui/react';
+import { Box, Text, SimpleGrid, VStack, HStack, Button } from '@chakra-ui/react';
 import { db } from '../firebase';
 import { getDocs, collection, getDoc, doc } from 'firebase/firestore';
 import {
@@ -20,6 +20,8 @@ const MENU_SECTIONS = {
   Lunch: '12:00 PM - 17:00 PM',
   Snacks: '17:00 PM - 19:00 PM',
   Dinner: '19:00 PM - 21:00 PM',
+  'Ice Cream': 'All Day',
+  Juices: 'All Day',
 };
 
 export default function Profile() {
@@ -29,6 +31,9 @@ export default function Profile() {
   const [wallet, setWallet] = useRecoilState(walletAtom);
   const [cart, setCart] = useRecoilState(cartAtom);
   const { user } = UserAuth();
+
+  // State to manage the selected category
+  const [selectedCategory, setSelectedCategory] = useState(Object.keys(MENU_SECTIONS)[0]);
 
   // Handle resizing for responsive UI
   useLayoutEffect(() => {
@@ -55,7 +60,7 @@ export default function Profile() {
             itemName: doc.get('itemName'),
             cost: doc.get('cost'),
             thumbnail: doc.get('thumbnail'),
-            category: doc.get('category'), // ensure this field is fetched
+            category: doc.get('category'), // Ensure this field is fetched
             count: 0,
           })
         );
@@ -115,31 +120,43 @@ export default function Profile() {
         </Text>
       </Box>
 
-      {/* Dynamically render each menu section */}
-      {Object.entries(MENU_SECTIONS).map(([category, timing]) => (
-        <VStack key={category} align="start" spacing={4} m={5}>
-          <Text fontSize="2xl" fontWeight="bold">
-            {category} ({timing})
-          </Text>
-          <SimpleGrid
-            columns={sWidth >= 768 ? (sWidth >= 1024 ? 3 : 2) : 1}
-            spacing={6}
-            w="100%"
+      {/* Render the section selector */}
+      <HStack spacing={4} justify="center" marginY={6}>
+        {Object.keys(MENU_SECTIONS).map((section) => (
+          <Button
+            key={section}
+            onClick={() => setSelectedCategory(section)}
+            colorScheme={selectedCategory === section ? 'teal' : 'gray'}
+            size="lg"
           >
-            {menu
-              .filter((item) => item.category === category) // Filter items by category
-              .map((item, index) => (
-                <MenuCard
-                  key={index}
-                  item={item}
-                  forCart
-                  incrementCart={incrementCart}
-                  decrementCart={decrementCart}
-                />
-              ))}
-          </SimpleGrid>
-        </VStack>
-      ))}
+            {section}
+          </Button>
+        ))}
+      </HStack>
+
+      {/* Dynamically render the selected menu section */}
+      <VStack align="start" spacing={4} m={5}>
+        <Text fontSize="2xl" fontWeight="bold">
+          {selectedCategory} ({MENU_SECTIONS[selectedCategory]})
+        </Text>
+        <SimpleGrid
+          columns={sWidth >= 768 ? (sWidth >= 1024 ? 3 : 2) : 1}
+          spacing={6}
+          w="100%"
+        >
+          {menu
+            .filter((item) => item.category === selectedCategory) // Filter items by selected category
+            .map((item, index) => (
+              <MenuCard
+                key={index}
+                item={item}
+                forCart
+                incrementCart={incrementCart}
+                decrementCart={decrementCart}
+              />
+            ))}
+        </SimpleGrid>
+      </VStack>
     </>
   );
 }

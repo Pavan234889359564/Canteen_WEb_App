@@ -13,38 +13,54 @@ import {
   Button,
   ModalBody,
   useDisclosure,
+  Input,
+  FormControl,
+  FormLabel,
 } from '@chakra-ui/react';
 import GoogleAuthBtn from '../components/buttons/GoogleAuth';
 import { UserAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { analytics } from '../firebase';
 import { logEvent } from 'firebase/analytics';
 
 export default function Auth() {
-  const { googleSignIn, user } = UserAuth();
+  const { googleSignIn, user, signInWithEmailAndPassword } = UserAuth();
   const navigate = useNavigate();
   const { isOpen, onClose, onOpen } = useDisclosure();
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
+
   useEffect(() => {
     document.title = 'Sign In | ScanToEat';
   });
-
-  const handleGoogleSignIn = async () => {
-    try {
-      await googleSignIn();
-      logEvent(analytics, 'login', {
-        method: 'Google',
-      });
-    } catch (error) {
-      onOpen();
-    }
-  };
 
   useEffect(() => {
     if (user != null) {
       navigate('/');
     }
   }, [user, navigate]);
+
+  const handleGoogleSignIn = async () => {
+    try {
+      await googleSignIn();
+      logEvent(analytics, 'login', { method: 'Google' });
+    } catch (error) {
+      onOpen();
+    }
+  };
+
+  const handleEmailPasswordLogin = async () => {
+    try {
+      setError('');
+      await signInWithEmailAndPassword(email, password);
+      logEvent(analytics, 'login', { method: 'Email & Password' });
+    } catch (error) {
+      setError('Failed to sign in. Please check your credentials or try again.');
+      onOpen();
+    }
+  };
 
   return (
     <>
@@ -53,10 +69,7 @@ export default function Auth() {
         <ModalContent>
           <ModalHeader>Failed to Sign In</ModalHeader>
           <ModalCloseButton />
-          <ModalBody>
-            Please use the acccount associated with VES Email Address!
-          </ModalBody>
-
+          <ModalBody>{error || 'An error occurred during login.'}</ModalBody>
           <ModalFooter>
             <Button colorScheme="blue" mr={3} onClick={onClose}>
               Close
@@ -77,11 +90,37 @@ export default function Auth() {
                   rel="noreferrer"
                 >
                   SIES
-                </a>{' '}
-              </Text>
-              google account to login here!
+                </a>
+              </Text>{' '}
+              google account or your email credentials to login!
             </Text>
             <GoogleAuthBtn onClick={handleGoogleSignIn} />
+            <Text>or</Text>
+            <FormControl id="email">
+              <FormLabel>Email Address</FormLabel>
+              <Input
+                type="email"
+                placeholder="Enter your email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+              />
+            </FormControl>
+            <FormControl id="password">
+              <FormLabel>Password</FormLabel>
+              <Input
+                type="password"
+                placeholder="Enter your password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+              />
+            </FormControl>
+            <Button
+              colorScheme="blue"
+              width="full"
+              onClick={handleEmailPasswordLogin}
+            >
+              Login
+            </Button>
           </Stack>
         </Flex>
         <Flex flex={1}>

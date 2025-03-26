@@ -5,13 +5,19 @@ import {
   wallet as walletAtom,
   menu as menuAtom,
 } from '../atoms';
-import { Center, Text, MenuDivider, Button } from '@chakra-ui/react';
+import {
+  Center,
+  Text,
+  MenuDivider,
+  Button,
+  IconButton,
+  Box,
+} from '@chakra-ui/react';
 import { IoBagCheckOutline } from 'react-icons/io5';
 import { AiOutlineLeft } from 'react-icons/ai';
 import { IoMdAdd } from 'react-icons/io';
 import { db } from '../firebase';
 import { doc, getDoc, updateDoc, setDoc } from 'firebase/firestore';
-import { IconButton } from '@chakra-ui/react';
 import uuid from 'react-uuid';
 import { useNavigate } from 'react-router-dom';
 import { UserAuth } from '../context/AuthContext';
@@ -92,7 +98,6 @@ export default function CheckoutList({ toggleToCheckout }) {
         ) : (
           <>
             <Text as="span" color="red.500">
-              {' '}
               Wallet Balance: ₹{wallet}
             </Text>
           </>
@@ -134,6 +139,27 @@ export default function CheckoutList({ toggleToCheckout }) {
           </Button>
         )}
       </Center>
+
+      {/* 👉 New Payment Navigation Section */}
+      <Box p={4}>
+        <Button
+          colorScheme="teal"
+          w="full"
+          mt={4}
+          onClick={() => navigate('/payment')}
+        >
+          Proceed to Payment
+        </Button>
+
+        <Button
+          variant="ghost"
+          w="full"
+          mt={2}
+          onClick={toggleToCheckout}
+        >
+          Back to Cart
+        </Button>
+      </Box>
     </>
   );
 }
